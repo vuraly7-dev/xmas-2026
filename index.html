@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>i 人聖誕生存微短劇｜社交電量保衛戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b10;--red:#e3263f;--gold:#f4c95d;--green:#2fbf71;--text:#f5f2ee;--muted:#a49e96}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;background:#000;color:var(--text);overflow:hidden}
+.stage{position:relative;max-width:480px;height:100%;margin:0 auto;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+.bgfx{position:absolute;inset:0;pointer-events:none;transition:background 1s}
+.bgfx::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0 2px,transparent 2px 4px)}
+.lights{position:absolute;top:0;left:0;right:0;height:26px;display:flex;justify-content:space-around;pointer-events:none;z-index:3}
+.lights i{width:9px;height:13px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;margin-top:9px;animation:glow 1.6s infinite}
+.lights i:nth-child(3n){background:var(--red)}.lights i:nth-child(3n+1){background:var(--gold);animation-delay:.5s}.lights i:nth-child(3n+2){background:var(--green);animation-delay:1s}
+@keyframes glow{50%{opacity:.25}}
+.lights::before{content:"";position:absolute;top:9px;left:0;right:0;height:1px;background:#ffffff22}
+
+.hud{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;padding:34px 16px 10px}
+.ep-tag{font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--gold)}
+.batt{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.cell{position:relative;width:62px;height:24px;border:2px solid #fff;border-radius:6px;padding:2px}
+.cell::after{content:"";position:absolute;right:-6px;top:6px;width:4px;height:8px;background:#fff;border-radius:0 2px 2px 0}
+.cell i{display:block;height:100%;border-radius:3px;background:var(--green);transition:width .7s cubic-bezier(.3,1.4,.5,1),background .5s}
+.cell b{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;color:#fff;text-shadow:0 1px 2px #000}
+.batt.low .cell{animation:shake .4s 2}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+.screen{position:relative;z-index:2;flex:1;overflow-y:auto;padding:4px 18px 18px;display:flex;flex-direction:column}
+.big-emoji{font-size:74px;text-align:center;margin:8px 0 4px;filter:drop-shadow(0 8px 24px rgba(0,0,0,.6));animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-6px)}}
+.lines{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.line{animation:sub .35s ease both;line-height:1.75;font-size:16px}
+@keyframes sub{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.line.nar{color:var(--muted);font-size:14.5px;text-align:center;font-style:italic}
+.line.say{background:#ffffff10;border:1px solid #ffffff1a;border-radius:14px;padding:9px 13px;align-self:flex-start;max-width:88%}
+.line.say b{display:block;font-size:12px;color:var(--gold);margin-bottom:1px}
+.line.inner{align-self:flex-end;max-width:88%;background:#2fbf7122;border:1px solid #2fbf7155;border-radius:14px;padding:9px 13px}
+.line.inner b{display:block;font-size:12px;color:var(--green);margin-bottom:1px}
+.line.big{font-family:"Noto Serif TC",serif;font-weight:900;font-size:22px;text-align:center;color:#fff;margin:6px 0}
+.delta{align-self:center;font-weight:900;font-size:15px;padding:6px 14px;border-radius:99px;animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
+.delta.minus{background:#e3263f2a;color:#ff6a7e;border:1px solid #e3263f66}
+.delta.plus{background:#2fbf7122;color:#5fe09a;border:1px solid #2fbf7166}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+.teaser{margin-top:6px;border-top:1px dashed #ffffff22;padding-top:12px;text-align:center;font-size:13.5px;color:var(--gold);line-height:1.7}
+.teaser span{display:block;font-size:11px;letter-spacing:.2em;color:var(--muted)}
+
+.dock{position:relative;z-index:4;padding:12px 16px 18px;background:linear-gradient(transparent,var(--bg) 30%)}
+.choice{display:block;width:100%;text-align:left;font:inherit;font-size:15.5px;line-height:1.55;color:#fff;background:#ffffff0d;border:1px solid #ffffff2a;border-radius:14px;padding:12px 14px;margin-bottom:8px;cursor:pointer;transition:.15s;animation:sub .3s ease both}
+.choice:hover{border-color:var(--gold);background:#ffffff16}
+.choice small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.btn{display:block;width:100%;font:inherit;font-weight:700;font-size:16px;border:0;border-radius:14px;padding:14px;background:var(--red);color:#fff;cursor:pointer;box-shadow:0 8px 24px #e3263f55}
+.btn.ghost{background:transparent;border:1px solid #ffffff33;box-shadow:none;margin-top:8px}
+
+/* cover */
+.cover{flex:1;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:0 6px}
+.cover .k{font-size:12px;letter-spacing:.3em;color:var(--gold)}
+.cover h1{font-family:"Noto Serif TC",serif;font-weight:900;font-size:40px;line-height:1.25;margin:12px 0}
+.cover h1 em{font-style:normal;color:var(--red)}
+.cover p{color:var(--muted);line-height:1.85;font-size:15px}
+.eps{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:22px 0 6px}
+.eps div{aspect-ratio:9/14;border-radius:8px;background:#ffffff0f;border:1px solid #ffffff1f;display:grid;place-items:center;font-size:12px;color:var(--muted);font-weight:700}
+.eps div:first-child{border-color:var(--red);color:#fff;background:#e3263f22}
+.rule{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* title card */
+.tcard{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;animation:sub .5s ease}
+.tcard .n{font-size:13px;letter-spacing:.35em;color:var(--gold)}
+.tcard h2{font-family:"Noto Serif TC",serif;font-size:36px;font-weight:900;margin:8px 0 6px}
+.tcard .d{font-size:13px;color:var(--muted)}
+
+/* result */
+.res{background:linear-gradient(165deg,#1d1b22,#121016);border:1px solid #ffffff1f;border-radius:20px;padding:22px 18px;margin-top:6px;animation:sub .5s ease}
+.res .k{font-size:12px;letter-spacing:.25em;color:var(--gold);text-align:center}
+.res h2{font-family:"Noto Serif TC",serif;font-size:30px;font-weight:900;text-align:center;margin:6px 0 2px}
+.res .sub{text-align:center;color:var(--red);font-weight:700;margin-bottom:14px}
+.res p{line-height:1.85;font-size:15px;color:#ddd7cf}
+.meter{margin:16px 0 6px}
+.meter .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px}
+.meter .lab b{color:#fff;font-size:15px}
+.ie{height:12px;border-radius:99px;background:linear-gradient(90deg,#4a7bd8,#9b6bd8,#e3263f);position:relative}
+.ie i{position:absolute;top:50%;width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #0b0b10;transform:translate(-50%,-50%);left:0;transition:left 1.2s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 0 2px #fff}
+.ie-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:6px}
+.spark{display:flex;align-items:flex-end;gap:5px;height:64px;margin-top:6px}
+.spark div{flex:1;border-radius:4px 4px 0 0;position:relative;min-height:3px}
+.spark div span{position:absolute;bottom:-17px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted)}
+.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:26px}
+.tags span{font-size:12px;padding:4px 10px;border-radius:99px;background:#ffffff12;color:#ddd}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(20px);opacity:0;background:#fff;color:#111;padding:9px 16px;border-radius:99px;font-size:14px;transition:.3s;z-index:9;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="bgfx" id="bg"></div>
+  <div class="lights"></div>
+  <div class="hud" id="hud" style="visibility:hidden">
+    <div class="ep-tag" id="eptag">EP.1</div>
+    <div class="batt" id="batt">社交電量<div class="cell"><i id="bfill"></i><b id="btxt">100%</b></div></div>
+  </div>
+  <div class="screen" id="screen"></div>
+  <div class="dock" id="dock"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const shareUrl = () => /claude|anthropic|usercontent/.test(location.hostname) || location.protocol==="file:" ? "" : "\n"+location.origin+location.pathname;
+document.querySelector(".lights").innerHTML = "<i></i>".repeat(14);
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+/* 劇本：n=旁白 s=對白 i=內心 B=大字 */
+const EP = [
+ {t:"群組通知", d:"12/19・週五倒數 3 天", e:"📱", bg:"#14213d",
+  lines:[["n","星期二下午 3:12，手機震了一下。"],["s","HR 小美","【公告】週五晚上聖誕派對，全員參加 🎄 請穿紅色，每組要準備 3 分鐘表演！"],["i","你","……全員？表演？？"],["n","已讀人數：47。你是第 48 個。"]],
+  q:"你要怎麼回應？",
+  c:[["已讀，然後假裝沒看到","把手機蓋起來就沒事了",0,-6,"你成功隱身。但小美在群組 @ 了你。"],
+     ["回一張「收到🫡」貼圖","最低限度的社交禮儀",-5,4,"完美。不多不少，標準 i 人回覆。"],
+     ["「我可以幫忙主持！」","你今天是不是喝太多咖啡",-22,20,"群組瞬間 30 個讚。你開始後悔了。"]],
+  next:"週五晚上，派對門口站著一個人……正張開雙手。"},
+ {t:"門口的擁抱", d:"12/20・派對開始", e:"🤗", bg:"#3a0d16",
+  lines:[["n","派對會場，音樂開很大聲。"],["s","派對魂小君（全公司最 e 的人）","欸～～你來了！！！來抱一個！！！"],["n","她張開雙臂，距離你還有三步。"],["i","你","大腦正在計算逃生路線……"]],
+  q:"三步、兩步……",
+  c:[["假裝接電話，從旁邊繞過去","「喂？對對對，我在忙」",-4,-2,"小君抱了個空，轉身去抱下一個人。安全。"],
+     ["迎上去：「好久不見！」","e 人模式，啟動",-16,15,"抱了 4 秒。你感覺靈魂被吸走一點點。"],
+     ["直接躲進廁所充電 5 分鐘","廁所是 i 人的避難所",10,-10,"你在廁所滑了 5 分鐘脆，電量回升。"]],
+  next:"你找了一個角落站好。但角落裡……已經有人了。"},
+ {t:"角落的陌生人", d:"12/21・尷尬時刻", e:"😶", bg:"#1b2a1f",
+  lines:[["n","隔壁部門的同事，你們從來沒說過話。"],["s","陌生同事","嗨……你是……那個……"],["n","沉默 3 秒。"],["n","沉默 5 秒。"],["i","你","這比季報還難。"]],
+  q:"打破沉默？",
+  c:[["「今天好冷喔」","天氣，永遠的安全牌",-9,5,"「對啊。」對話結束。但至少你們都盡力了。"],
+     ["拿出手機假裝回訊息","對方也立刻拿出手機，默契十足",-2,-6,"兩個 i 人，一個角落，各滑各的。這就是和平。"],
+     ["「你最近有在追什麼微短劇嗎？」","話題王炸",-14,16,"對方眼睛亮了，你們聊了 20 分鐘。你需要休息。"]],
+  next:"主持人拿起麥克風：「接下來，我們要請一位……」"},
+ {t:"被點名了", d:"12/22・聚光燈", e:"🎤", bg:"#3d2a05",
+  lines:[["s","主持人","接下來，請今年『最安靜的同事』上台！"],["n","聚光燈轉了一圈。"],["n","停在你身上。"],["B","全場 87 雙眼睛看著你。"],["i","你","我現在消失還來得及嗎？"]],
+  q:"你的選擇是：",
+  c:[["上台清唱一首聖誕歌","豁出去了",-30,25,"唱完全場歡呼。你的手還在抖。"],
+     ["「不好意思，我今天喉嚨痛……」","經典藉口",-8,0,"主持人說「沒關係～」，但氣氛冷了 2 秒。"],
+     ["把小君拉上台當伴舞","讓 e 人去扛",-18,14,"小君跳得比你唱得還認真。全場焦點轉移。"]],
+  next:"交換禮物時間。你抽到的……是主管準備的禮物。"},
+ {t:"主管的禮物", d:"12/23・交換禮物", e:"🎁", bg:"#2a1036",
+  lines:[["s","主管","打開看看，喜不喜歡～"],["n","你慢慢拆開包裝紙。"],["n","是一本書。"],["B","《30 天成為更外向的人》"],["i","你","……這是暗示嗎？這是暗示吧？"]],
+  q:"大家都在看你的反應：",
+  c:[["「哇！我超需要的！」","表情管理 ㄅ級分",-14,10,"主管很滿意。你內心已經在退貨。"],
+     ["尷尬微笑，點頭三下","標準 i 人反應",-9,-2,"全場安靜了一秒，然後有人開始鼓掌。"],
+     ["「主管，你在暗示我嗎？」","直球對決",-20,20,"全場爆笑。主管笑到蹲下。你成了今晚的梗。"]],
+  next:"派對結束了。但有人大喊：「走！續攤！」"},
+ {t:"續攤危機", d:"12/24・平安夜", e:"🎶", bg:"#08303a",
+  lines:[["s","小君","走走走！大家去唱 KTV！今天唱到天亮！"],["n","所有人都開始穿外套。"],["n","有人已經在叫車了。"],["i","你","電量警告。電量警告。"]],
+  q:"你要……",
+  c:[["「我家的貓在等我」（你沒有養貓）","速閃，i 人最高奧義",15,-12,"你用最快的速度消失在夜色中。沒有人發現。"],
+     ["跟去，但只負責點歌","人在心不在",-15,6,"你點了 12 首歌，自己一首都沒唱。完美。"],
+     ["第一個衝去搶麥克風","今晚，你不是你",-32,25,"你唱了 3 小時。明天的你會恨今天的你。"]],
+  next:"終於……回到家了。"},
+ {t:"回家", d:"12/25・聖誕節", e:"🛋️", bg:"#1a1410",
+  lines:[["n","打開家門。好安靜。"],["n","你倒在沙發上。"],["i","你","今天，我活下來了。"],["n","手機又震了一下。群組：「今天好好玩～明年再辦！」"]],
+  q:"最後一個決定：",
+  c:[["關機。躺平。聖誕快樂。","世界與我無關",30,-8,"你睡了 11 個小時。這是今年最好的聖誕禮物。"],
+     ["在脆上發文：「今日社交額度已用完」","引起 i 人大共鳴",12,4,"收到 2,300 個讚，全是 i 人。你們彼此懂。"],
+     ["回群組：「好好玩！明年我還要主持！」","你已經不是當初的你了",-10,14,"群組瞬間爆炸。你被列為明年的負責人。"]],
+  next:null}
+];
+
+let S;
+function start(){
+  S = {batt:100, e:0, ep:0, log:[], picks:[]};
+  $("hud").style.visibility="hidden";
+  $("bg").style.background="radial-gradient(ellipse at 50% 20%,#3a0d16,transparent 70%)";
+  $("screen").innerHTML = `
+    <div class="cover">
+      <div class="k">原創互動微短劇・全 7 集</div>
+      <h1>i 人的<br><em>聖誕生存</em>指南</h1>
+      <p>公司聖誕派對，全員強制參加。<br>你的社交電量只有 <b style="color:#fff">100%</b>。<br>每一個選擇，都會消耗或回復電量。</p>
+      <div class="eps">${EP.map((_,i)=>`<div>EP${i+1}</div>`).join("")}</div>
+      <div class="rule">⚡ 電量歸零 → 觸發「速閃結局」</div>
+      <div class="rule" style="font-size:11px;opacity:.7">※ 劇情與角色純屬虛構，如有雷同純屬巧合・© 2026 liva</div>
+    </div>`;
+  $("dock").innerHTML = `<button class="btn" id="go">▶ 開始第 1 集</button>`;
+  $("go").onclick = ()=> episode(0);
+}
+
+function setBatt(v){
+  S.batt = Math.max(0, Math.min(100, v));
+  $("bfill").style.width = S.batt+"%";
+  $("bfill").style.background = S.batt>50?"var(--green)":S.batt>20?"var(--gold)":"var(--red)";
+  $("btxt").textContent = S.batt+"%";
+  const b=$("batt"); b.classList.remove("low"); void b.offsetWidth; if(S.batt<=20) b.classList.add("low");
+}
+
+async function episode(i){
+  S.ep=i; const ep=EP[i];
+  $("hud").style.visibility="visible"; $("eptag").textContent=`EP.${i+1} / 7`;
+  setBatt(S.batt);
+  $("bg").style.background=`radial-gradient(ellipse at 50% 15%,${ep.bg},transparent 75%)`;
+  $("dock").innerHTML="";
+  $("screen").innerHTML=`<div class="tcard"><div class="n">第 ${i+1} 集</div><h2>${ep.t}</h2><div class="d">${ep.d}</div></div>`;
+  await sleep(1500);
+  $("screen").innerHTML=`<div class="big-emoji">${ep.e}</div><div class="lines" id="lines"></div>`;
+  const L=$("lines");
+  for(const ln of ep.lines){
+    const d=document.createElement("div");
+    if(ln[0]==="n") { d.className="line nar"; d.textContent=ln[1]; }
+    else if(ln[0]==="B") { d.className="line big"; d.textContent=ln[1]; }
+    else if(ln[0]==="s") { d.className="line say"; d.innerHTML=`<b>${ln[1]}</b>${ln[2]}`; }
+    else { d.className="line inner"; d.innerHTML=`<b>（內心）</b>${ln[2]}`; }
+    L.appendChild(d); $("screen").scrollTop=1e9;
+    await sleep(ln[0]==="B"?1300:950);
+  }
+  const q=document.createElement("div"); q.className="line nar"; q.style.color="#fff"; q.style.fontStyle="normal"; q.style.fontWeight="700"; q.textContent=ep.q;
+  L.appendChild(q); $("screen").scrollTop=1e9;
+  $("dock").innerHTML = ep.c.map((c,k)=>`<button class="choice" data-k="${k}" style="animation-delay:${k*.08}s">${c[0]}<small>${c[1]}</small></button>`).join("");
+  $("dock").querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(i,+b.dataset.k));
+}
+
+async function choose(i,k){
+  const ep=EP[i], c=ep.c[k];
+  $("dock").innerHTML="";
+  const L=$("lines");
+  const me=document.createElement("div"); me.className="line inner"; me.innerHTML=`<b>你選擇了</b>${c[0]}`; L.appendChild(me);
+  await sleep(500);
+  const r=document.createElement("div"); r.className="line nar"; r.textContent=c[4]; L.appendChild(r);
+  await sleep(400);
+  const dl=document.createElement("div"); dl.className="delta "+(c[2]<0?"minus":"plus");
+  dl.textContent=`社交電量 ${c[2]>=0?"+":""}${c[2]}%`; L.appendChild(dl);
+  S.e += c[3]; S.picks.push(c[0]);
+  setBatt(S.batt + c[2]); S.log.push(S.batt);
+  $("screen").scrollTop=1e9;
+  await sleep(700);
+  if(S.batt<=0){ return ending(true); }
+  if(ep.next){
+    const t=document.createElement("div"); t.className="teaser"; t.innerHTML=`<span>下集預告</span>${ep.next}`; L.appendChild(t);
+    $("screen").scrollTop=1e9;
+    $("dock").innerHTML=`<button class="btn" id="nx">▶ 看第 ${i+2} 集</button>`;
+    $("nx").onclick=()=>episode(i+1);
+  } else {
+    $("dock").innerHTML=`<button class="btn" id="nx">🎬 看我的結局</button>`;
+    $("nx").onclick=()=>ending(false);
+  }
+}
+
+function ending(drained){
+  // e 度：把累積 e 分數映射到 0–100
+  const ePct = Math.round(Math.max(3, Math.min(97, 35 + S.e*0.55)));
+  let title, sub, desc, tags;
+  if(drained){
+    title="電量耗盡・速閃結局"; sub=`在第 ${S.ep+1} 集默默消失`;
+    desc=`你在「${EP[S.ep].t}」那一刻電量歸零，悄悄從派對消失。沒有人發現你離開，這正是 i 人的最高境界。回家路上的便利商店，是你今晚最溫暖的地方。`;
+    tags=["#速閃大師","#社交電量0%","#隱形技能滿點"];
+  } else if(ePct>=65){
+    title="隱藏版 e 人"; sub="披著 i 人外皮的派對動物";
+    desc="你嘴上說自己是 i 人，但今晚主持、唱歌、搶麥一樣沒少。真相是：你只是需要一個藉口。明年的派對負責人，非你莫屬。";
+    tags=["#其實是e人","#派對救星","#明年主持人"];
+  } else if(ePct>=45){
+    title="適應型 ie 人"; sub="該社交時社交，該消失時消失";
+    desc="你懂得在必要時切換 e 人模式，也知道什麼時候該躲進廁所充電。這是職場最高級的生存技能：電量管理大師。";
+    tags=["#ie人","#電量管理大師","#職場生存王"];
+  } else {
+    title="純血 i 人"; sub="守住了自己的電量與尊嚴";
+    desc="全場最安靜，但你活下來了，而且電量還有剩。你不需要別人的掌聲，回家關機的那一刻，就是你的聖誕奇蹟。";
+    tags=["#純血i人","#回家就是勝利","#今日社交額度已用完"];
+  }
+  S.result={title,ePct};
+  $("hud").style.visibility="hidden";
+  $("bg").style.background="radial-gradient(ellipse at 50% 10%,#3a0d16,transparent 70%)";
+  const bars = S.log.map((v,i)=>`<div style="height:${Math.max(4,v)}%;background:${v>50?"#2fbf71":v>20?"#f4c95d":"#e3263f"}"><span>EP${i+1}</span></div>`).join("");
+  $("screen").innerHTML=`
+    <div class="res">
+      <div class="k">你的結局</div>
+      <h2>${title}</h2>
+      <div class="sub">${sub}</div>
+      <p>${desc}</p>
+      <div class="meter">
+        <div class="lab"><span>你的 e 度</span><b>${ePct}%</b></div>
+        <div class="ie"><i id="dot"></i></div>
+        <div class="ie-ends"><span>i 人</span><span>e 人</span></div>
+      </div>
+      <div class="meter">
+        <div class="lab"><span>每集社交電量</span><b>剩 ${S.batt}%</b></div>
+        <div class="spark">${bars}</div>
+      </div>
+      <div class="tags">${tags.map(t=>`<span>${t}</span>`).join("")}</div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:14px">e 度純屬娛樂，並非心理測驗或人格評估<br>© 2026 liva</div>
+    </div>`;
+  setTimeout(()=>{ const d=$("dot"); if(d) d.style.left=ePct+"%"; },120);
+  $("dock").innerHTML=`<button class="btn" id="sh">複製結果，找朋友比 e 度 👀</button><button class="btn ghost" id="re">重看一次，換條路線</button>`;
+  $("re").onclick=start;
+  $("sh").onclick=async()=>{
+    const txt=`我在《i 人的聖誕生存指南》打出「${title}」結局！\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄${shareUrl()}`;
+    try{ await navigator.clipboard.writeText(txt); toast("已複製！貼給朋友比比看 🎄"); }
+    catch(e){ toast("無法自動複製，截圖分享也可以 📸"); }
+  };
+}
+
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
+start();
+</script>
+</body>
+</html>
