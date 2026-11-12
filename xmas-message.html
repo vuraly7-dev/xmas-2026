@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="同一句聖誕快樂，阿嬤、二姑、主管、前任讀到的都不一樣。拼出一句讓全群組沒人誤會的祝福！">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:site_name" content="聖誕節線上小遊戲 2026">
+<meta property="og:title" content="聖誕祝福，不准誤會 💬｜群組生存遊戲">
+<meta property="og:description" content="同一句聖誕快樂，阿嬤、二姑、主管、前任讀到的都不一樣。拼出一句讓全群組沒人誤會的祝福！">
+<meta property="og:url" content="https://vuraly7-dev.github.io/xmas-2026/xmas-message.html">
+<meta property="og:image" content="https://vuraly7-dev.github.io/xmas-2026/og-message.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="聖誕祝福，不准誤會 💬｜群組生存遊戲">
+<meta name="twitter:description" content="同一句聖誕快樂，阿嬤、二姑、主管、前任讀到的都不一樣。拼出一句讓全群組沒人誤會的祝福！">
+<meta name="twitter:image" content="https://vuraly7-dev.github.io/xmas-2026/og-message.png">
+<meta name="theme-color" content="#0f2a20">
+<title>聖誕祝福，不准誤會｜群組生存遊戲</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eef3;--me:#9be27a;--red:#d7263d;--green:#1f8a5b;--ink:#1c2228;--muted:#7a8590;--gold:#f2b632}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:"Noto Sans TC",system-ui,sans-serif;color:var(--ink);background:#cfd8e0}
+.app{max-width:520px;height:100%;margin:0 auto;display:flex;flex-direction:column;background:var(--bg);position:relative;overflow:hidden}
+/* cover */
+.cover{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;justify-content:center;padding:28px 24px;
+  background:radial-gradient(ellipse at 50% 0%,#2a5a45,#0f2a20 70%);color:#fff;text-align:center}
+.cover .k{font-size:12px;letter-spacing:.3em;color:var(--gold)}
+.cover h1{font-family:"Noto Serif TC",serif;font-size:40px;line-height:1.3;margin:14px 0}
+.cover h1 em{font-style:normal;color:#ff6b7d}
+.cover p{line-height:1.9;color:#d6e6dd;font-size:15px}
+.demo{background:#ffffff14;border:1px solid #ffffff25;border-radius:16px;padding:14px;margin:22px 0;text-align:left;font-size:14px;line-height:1.8}
+.demo b{color:var(--gold)}
+.btn{display:block;width:100%;font:inherit;font-weight:700;font-size:16.5px;border:0;border-radius:14px;padding:15px;cursor:pointer;background:var(--red);color:#fff;box-shadow:0 8px 22px #d7263d55}
+.btn.ghost{background:transparent;color:inherit;border:1px solid currentColor;box-shadow:none;margin-top:9px;opacity:.85}
+.btn:disabled{background:#b9c2ca;box-shadow:none;cursor:default}
+.foot{font-size:11px;color:#8fb3a2;margin-top:16px;line-height:1.7}
+/* header */
+header{display:flex;align-items:center;gap:10px;padding:12px 14px;background:#2b3a46;color:#fff;flex:none}
+header .gi{width:38px;height:38px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font-size:20px}
+header b{display:block;font-size:15.5px}
+header span{font-size:12px;color:#b9c6d1}
+header .lv{margin-left:auto;font-size:12px;background:#ffffff1f;padding:4px 10px;border-radius:99px;white-space:nowrap}
+/* readers */
+.readers{display:flex;gap:6px;padding:10px 10px 8px;background:#f7f9fb;border-bottom:1px solid #d9e0e6;flex:none}
+.rd{flex:1;text-align:center;font-size:11.5px;color:var(--muted)}
+.rd .av{width:44px;height:44px;margin:0 auto 3px;border-radius:50%;background:#fff;border:2px solid #d9e0e6;display:grid;place-items:center;font-size:24px;position:relative;transition:border-color .3s}
+.rd .mood{position:absolute;right:-6px;bottom:-4px;font-size:17px}
+.rd.hap .av{border-color:#1f8a5b}.rd.ang .av{border-color:var(--red)}.rd.ok .av{border-color:#f2b632}
+/* chat */
+#chat{flex:1;overflow-y:auto;padding:14px 12px 8px}
+.sysm{text-align:center;font-size:12px;color:var(--muted);margin:4px 0 12px}
+.sysm span{background:#d6dee5;padding:4px 10px;border-radius:99px}
+.row{display:flex;gap:8px;margin-bottom:10px;animation:in .3s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+.row .a{width:32px;height:32px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:18px;flex:none}
+.row .nm{font-size:11.5px;color:var(--muted);margin-bottom:2px}
+.bub{background:#fff;border-radius:4px 16px 16px 16px;padding:8px 12px;font-size:15px;line-height:1.55;max-width:250px;box-shadow:0 1px 1px #0000000d}
+.row.me{justify-content:flex-end;align-items:flex-end;gap:6px}
+.row.me .bub{background:var(--me);border-radius:16px 4px 16px 16px;max-width:280px}
+.read{font-size:11px;color:var(--muted);white-space:nowrap}
+.typing{color:var(--muted);font-size:13px}
+/* composer */
+.comp{flex:none;background:#fff;border-top:1px solid #d9e0e6;padding:10px 12px 14px}
+.preview{min-height:44px;background:#f2f5f8;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.5;margin-bottom:8px;color:#9aa5af}
+.preview.full{color:var(--ink)}
+.slot{margin-bottom:7px}
+.slot .lab{font-size:11px;color:var(--muted);margin-bottom:4px;letter-spacing:.1em}
+.tiles{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.tiles::-webkit-scrollbar{display:none}
+.tile{flex:none;font:inherit;font-size:13.5px;background:#f2f5f8;border:1.5px solid #dde4ea;border-radius:99px;padding:7px 12px;cursor:pointer;white-space:nowrap;color:var(--ink)}
+.tile.on{background:#2b3a46;border-color:#2b3a46;color:#fff}
+.sendrow{display:flex;gap:8px;align-items:center;margin-top:4px}
+.tries{font-size:12px;color:var(--muted);white-space:nowrap}
+/* result sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:15;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 22px;box-shadow:0 -10px 40px #0003;transform:translateY(110%);transition:transform .45s cubic-bezier(.2,1.1,.3,1)}
+.sheet.show{transform:none}
+.stars{font-size:38px;text-align:center;letter-spacing:6px}
+.sheet h2{text-align:center;font-size:21px;margin:4px 0 4px}
+.sheet p{text-align:center;color:var(--muted);font-size:14px;line-height:1.7;margin-bottom:14px}
+.sheet .btn.ghost{color:var(--ink)}
+.final{text-align:center}
+.final .big{font-family:"Noto Serif TC",serif;font-size:30px;margin:6px 0}
+.final .tt{display:inline-block;background:#2b3a46;color:#fff;border-radius:99px;padding:6px 16px;font-weight:700;margin:6px 0 10px}
+.lvls{display:flex;gap:8px;justify-content:center;margin:8px 0 16px}
+.lvls div{background:#f2f5f8;border-radius:12px;padding:8px 10px;font-size:12px;min-width:90px}
+.lvls b{display:block;font-size:15px;color:var(--gold)}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%) translateY(20px);opacity:0;background:#1c2228;color:#fff;padding:9px 16px;border-radius:99px;font-size:14px;transition:.3s;z-index:60;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="cover" id="cover">
+    <div class="k">聖誕群組生存遊戲</div>
+    <h1>聖誕祝福，<br><em>不准誤會</em></h1>
+    <p>你要在群組裡發一則聖誕祝福。<br>問題是——<b>每個人讀到的意思都不一樣。</b></p>
+    <div class="demo">
+      你傳：「今年過得很充實 ❤️」<br>
+      👵 阿嬤讀到：<b>充實就好</b><br>
+      💁‍♀️ 二姑讀到：<b>充實？那有對象了沒？</b><br>
+      🧑‍🎤 表弟讀到：<b>好肉麻</b>
+    </div>
+    <p style="font-size:14px">拼出一句讓<b>群組裡沒有人誤會</b>的祝福。<br>三關：公司群組 → 同學會群組 → 家族群組</p>
+    <button class="btn" id="go" style="margin-top:22px">開始發訊息</button>
+    <div class="foot">純屬虛構娛樂・不讀取、不儲存任何資料・© 2026 liva</div>
+  </div>
+  <header><div class="gi" id="gi"></div><div><b id="gn"></b><span id="gs"></span></div><div class="lv" id="lv"></div></header>
+  <div class="readers" id="readers"></div>
+  <div id="chat"></div>
+  <div class="comp" id="comp"></div>
+  <div class="sheet" id="sheet"></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const shareUrl = () => /claude|anthropic|usercontent/.test(location.hostname) || location.protocol==="file:" ? "" : "\n"+location.origin+location.pathname;
+const LV = [{"name": "業務二部（含主管）", "icon": "💼", "sub": "公司群組・18 人", "readers": [["主管", "👔"], ["同事小君", "👩‍💻"], ["HR", "📋"], ["實習生", "🧑‍🎓"]], "slots": [[["各位辛苦了，聖誕快樂！", [[1, "有團隊意識"], [1, "你也辛苦了"], [1, "氣氛真好"], [0, "前輩好"]]], ["終於要放假了🎉", [[-2, "12/25 沒有放假"], [2, "懂"], [-1, "請依行事曆"], [1, "真的嗎！"]]], ["報告主管，聖誕快樂", [[2, "嗯，很好"], [-2, "馬屁精"], [0, "嗯"], [0, "學起來"]]], ["Merry Christmas everyone", [[0, "嗯"], [0, "好喔"], [1, "很國際化"], [1, "好潮"]]]], [["今年學到很多", [[1, "知道就好"], [0, "嗯"], [1, "有成長"], [1, "前輩好認真"]]], ["明年繼續衝業績！", [[2, "這才對"], [-2, "要衝你自己衝"], [0, ""], [-1, "壓力好大"]]], ["謝謝小君一直幫我", [[-1, "那我呢？"], [2, "不客氣💕"], [1, "團隊合作"], [0, ""]]], ["今天可以準時下班嗎", [[-2, "……"], [2, "拜託"], [0, "依規定可以"], [2, "拜託拜託"]]]], [["🎄", [[0, ""], [0, ""], [0, ""], [1, "可愛"]]], ["交換禮物準備好了！", [[0, "嗯"], [1, "我也是"], [2, "終於有人回應活動了"], [1, "我也準備了"]]], ["（貼圖：敬禮🫡）", [[1, "嗯"], [0, ""], [0, ""], [-1, "好老的貼圖"]]], ["明天的會議我會準時", [[2, "很好"], [-1, "幹嘛提會議"], [0, ""], [-1, "什麼會議？？"]]]]]}, {"name": "三年二班永遠的家", "icon": "🏫", "sub": "同學會群組・前任也在", "readers": [["前任", "💔"], ["班長", "📣"], ["班導", "👨‍🏫"], ["阿明", "🤪"]], "slots": [[["好久不見！聖誕快樂", [[0, "…好久不見"], [1, "好久不見！"], [1, "同學們好"], [1, "欸你還活著"]]], ["欸～大家還記得我嗎", [[-1, "怎麼可能忘記"], [1, "當然記得！"], [0, "記得記得"], [2, "記得你欠我 100"]]], ["老師聖誕快樂！", [[0, ""], [1, "老師好"], [2, "還記得老師，感動"], [-1, "又在拍馬屁"]]], ["Merry Xmas～", [[-1, "以前我們都這樣講…"], [0, "嗯"], [-1, "看不懂"], [1, "好喔"]]]], [["最近過得很好", [[-2, "沒有我過得很好是吧"], [1, "太好了"], [1, "老師很欣慰"], [0, "炫耀"]]], ["今年一個人過聖誕", [[1, "……我也是"], [2, "那來同學會啊！"], [-1, "要照顧好自己"], [1, "我陪你"]]], ["大家要不要辦同學會", [[0, "看情況"], [2, "終於有人說了！"], [1, "老師一定到"], [1, "有吃的就去"]]], ["最近在追一部微短劇", [[1, "我們以前也一起追劇"], [-1, "已讀"], [-1, "多讀書"], [2, "哪部！"]]]], [["❤️", [[-2, "這顆愛心是給誰的？"], [0, ""], [1, "老師也愛你們"], [-1, "噁"]]], ["🙏", [[0, ""], [1, "🙏"], [1, "🙏"], [0, ""]]], ["@阿明 欠我的 100 還來", [[1, "哈，你一點都沒變"], [1, "哈哈哈"], [-1, "同學之間不要借錢"], [-1, "我們不是說好不提"]]], ["（你收回了一則訊息）", [[-2, "收回了什麼？？"], [-1, "？"], [0, ""], [2, "已截圖"]]]]]}, {"name": "相親相愛一家人", "icon": "👨‍👩‍👧‍👦", "sub": "家族群組・42 人", "readers": [["阿嬤", "👵"], ["二姑", "💁‍♀️"], ["媽媽", "👩"], ["表弟", "🧑‍🎤"]], "slots": [[["各位家人聖誕快樂🎄", [[1, "聖誕節是啥？算了，乖孫有心"], [0, "嗯"], [1, "有記得群組，很好"], [-1, "好老派…"]]], ["Merry Xmas 🎅✨", [[-2, "看嘸啦，番仔字"], [0, "英文喔"], [0, "這是什麼意思"], [1, "可以"]]], ["阿嬤！聖誕快樂！", [[2, "我的乖孫！！"], [-1, "只跟阿嬤說？我呢"], [1, "孝順"], [0, "…"]]], ["（長輩圖：平安喜樂🌸）", [[2, "這張圖真水"], [1, "轉傳了"], [0, "你什麼時候變這樣"], [-2, "救命，長輩圖"]]]], [["今年過得很充實", [[1, "充實就好"], [-2, "充實？那有對象了沒？"], [0, "嗯"], [0, "好喔"]]], ["工作很忙但很開心", [[-1, "忙到都不回來"], [0, "賺多少？"], [-1, "忙到不回家喔"], [0, "社畜加油"]]], ["過年一定回家吃飯", [[2, "阿嬤煮你最愛吃的"], [-1, "回來我介紹對象給你"], [2, "你說的喔"], [0, "那我也回"]]], ["最近在學煮飯", [[1, "會煮飯好"], [2, "會煮飯，可以結婚了"], [0, "上次寄的水餃吃完了嗎"], [1, "教我"]]]], [["❤️", [[1, "愛心"], [0, ""], [1, "媽媽也愛你"], [-1, "好肉麻"]]], ["（附上紅包 🧧）", [[1, "這孩子懂事"], [1, "有我的嗎"], [-1, "亂花錢"], [2, "我的呢我的呢"]]], ["祝大家平安健康", [[1, "平安就好"], [1, "大家都健康"], [1, "你也是"], [0, "好喔"]]], ["😂", [[-1, "笑什麼"], [-1, "在笑我嗎？"], [0, "？"], [2, "哈哈哈哈"]]]]]}];
+const SLOT = ["開頭","中段","結尾"];
+const $ = id => document.getElementById(id);
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+let cur=0, pick=[null,null,null], tries=0, busy=false, results=[];
+
+function moodOf(v){ return v>=1?["hap","😊"]:v===0?["ok","😐"]:["ang","😠"]; }
+
+function load(i){
+  cur=i; pick=[null,null,null]; tries=0; busy=false;
+  const L=LV[i];
+  $("gi").textContent=L.icon; $("gn").textContent=L.name; $("gs").textContent=L.sub; $("lv").textContent=`第 ${i+1} / ${LV.length} 關`;
+  $("readers").innerHTML=L.readers.map((r,k)=>`<div class="rd" id="rd${k}"><div class="av">${r[1]}<span class="mood" id="md${k}"></span></div>${r[0]}</div>`).join("");
+  $("chat").innerHTML=`<div class="sysm"><span>12 月 24 日 晚上 8:00</span></div><div class="sysm"><span>${["主管","班長","媽媽"][i]||"有人"}：今天大家記得說聖誕快樂喔～</span></div>`;
+  $("sheet").classList.remove("show");
+  renderComp();
+}
+
+function msgText(){ return pick.map((p,s)=>p===null?null:LV[cur].slots[s][p][0]); }
+function renderComp(){
+  const L=LV[cur], t=msgText(), full=t.every(x=>x!==null);
+  $("comp").innerHTML=`
+    <div class="preview ${full?"full":""}" id="pv">${t.some(x=>x!==null)? t.map(x=>x??"＿＿").join(" ") : "從下面三排各選一句，組成你的祝福"}</div>
+    ${L.slots.map((sl,s)=>`<div class="slot"><div class="lab">${SLOT[s]}</div><div class="tiles">${sl.map((tl,k)=>`<button class="tile ${pick[s]===k?"on":""}" data-s="${s}" data-k="${k}">${tl[0]}</button>`).join("")}</div></div>`).join("")}
+    <div class="sendrow"><span class="tries">已傳 ${tries} 次</span><button class="btn" id="send" ${full&&!busy?"":"disabled"} style="padding:12px">傳送 ➤</button></div>`;
+  $("comp").querySelectorAll(".tile").forEach(b=>b.onclick=()=>{ if(busy) return; pick[+b.dataset.s]=+b.dataset.k; renderComp(); });
+  $("send").onclick=send;
+}
+
+async function send(){
+  if(busy) return; busy=true; tries++;
+  const L=LV[cur], text=msgText().join(" ");
+  renderComp();
+  const chat=$("chat");
+  const me=document.createElement("div"); me.className="row me"; me.innerHTML=`<span class="read" id="rdc"></span><div class="bub">${text}</div>`;
+  chat.appendChild(me); chat.scrollTop=1e9;
+  L.readers.forEach((_,k)=>{ $("md"+k).textContent=""; $("rd"+k).className="rd"; });
+  // 計分
+  const sc=L.readers.map((_,r)=>pick.reduce((a,p,s)=>a+L.slots[s][p][1][r][0],0));
+  // 每位讀者挑出最強烈的解讀
+  const os=L.readers.map((_,r)=>{
+    let best=null; pick.forEach((p,s)=>{ const v=L.slots[s][p][1][r]; if(v[1] && (!best || Math.abs(v[0])>Math.abs(best[0]))) best=v; });
+    return best;
+  });
+  const order=L.readers.map((_,k)=>k).sort(()=>Math.random()-.5);
+  let n=0;
+  for(const r of order){
+    await sleep(650);
+    n++; $("rdc").textContent=`已讀 ${n}`;
+    const [cls,face]=moodOf(sc[r]);
+    $("rd"+r).className="rd "+cls; $("md"+r).textContent=face;
+    const line = os[r] ? os[r][1] : (sc[r]>=1?"聖誕快樂！":sc[r]===0?"（已讀）":"……");
+    const tail = sc[r]>=2?" 😍":sc[r]===1?" 😊":sc[r]===0?"":" 😠";
+    const row=document.createElement("div"); row.className="row";
+    row.innerHTML=`<div class="a">${L.readers[r][1]}</div><div><div class="nm">${L.readers[r][0]}</div><div class="bub">${line}${tail}</div></div>`;
+    chat.appendChild(row); chat.scrollTop=1e9;
+  }
+  await sleep(700);
+  const allHappy=sc.every(v=>v>=1), noAngry=sc.every(v=>v>=0);
+  const stars = allHappy?3:noAngry?2:0;
+  const angry = L.readers.filter((_,r)=>sc[r]<0).map(x=>x[0]);
+  if(stars){ results[cur]={stars,tries,text}; }
+  sheet(stars, angry);
+}
+
+function sheet(stars, angry){
+  const last = cur===LV.length-1;
+  const s=$("sheet");
+  if(stars===3){
+    s.innerHTML=`<div class="stars">⭐⭐⭐</div><h2>全員開心！</h2><p>群組外交大成功，傳了 ${tries} 次就讓所有人都滿意。</p>
+      <button class="btn" id="nx">${last?"看總成績 🎄":"下一個群組 ➤"}</button><button class="btn ghost" id="rt">再挑戰別的說法</button>`;
+  } else if(stars===2){
+    s.innerHTML=`<div class="stars">⭐⭐<span style="opacity:.2">⭐</span></div><h2>沒人生氣，但有人無感</h2><p>過關了！想拿三星，就要讓每個人都開心。</p>
+      <button class="btn" id="nx">${last?"看總成績 🎄":"下一個群組 ➤"}</button><button class="btn ghost" id="rt">再試一次拿三星</button>`;
+  } else {
+    s.innerHTML=`<div class="stars">💥</div><h2>群組炸了</h2><p>${angry.join("、")} 誤會了你的意思……<br>看看他們的回覆，換個說法再試一次。</p>
+      <button class="btn" id="rt">收回訊息，重新編輯</button>`;
+  }
+  s.classList.add("show");
+  if($("nx")) $("nx").onclick=()=> last? final() : load(cur+1);
+  $("rt").onclick=()=>{ s.classList.remove("show"); busy=false; renderComp(); };
+}
+
+function final(){
+  const total=results.reduce((a,r)=>a+(r?r.stars:0),0), tt=results.reduce((a,r)=>a+(r?r.tries:0),0);
+  const title= total>=9?"群組外交官":total>=7?"訊息公關達人":total>=6?"安全下莊的人":"建議已讀不回";
+  const s=$("sheet");
+  s.innerHTML=`<div class="final">
+    <div style="font-size:13px;color:var(--muted);letter-spacing:.2em">總成績</div>
+    <div class="big">⭐ ${total} / 9</div>
+    <div class="tt">${title}</div>
+    <div class="lvls">${LV.map((L,i)=>`<div>${L.icon} ${L.name.slice(0,4)}<b>${"⭐".repeat(results[i]?results[i].stars:0)}</b>傳了 ${results[i]?results[i].tries:0} 次</div>`).join("")}</div>
+    <button class="btn" id="sh">複製戰績，考考朋友 🎄</button>
+    <button class="btn ghost" id="again">從第一關重新開始</button>
+    <div style="font-size:11px;color:var(--muted);margin-top:12px">純屬虛構娛樂・© 2026 liva</div></div>`;
+  s.classList.add("show");
+  $("again").onclick=()=>{ results=[]; load(0); };
+  $("sh").onclick=async()=>{
+    const txt=`我在《聖誕祝福，不准誤會》拿到 ${total}/9 顆星，稱號「${title}」🎄\n總共傳了 ${tt} 次訊息才讓所有群組沒人誤會。\n家族群組最難，你敢挑戰嗎？${shareUrl()}`;
+    try{ await navigator.clipboard.writeText(txt); toast("已複製！貼給朋友比比看 🎄"); }catch(e){ toast("無法自動複製，截圖分享也可以 📸"); }
+  };
+}
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
+$("go").onclick=()=>{ $("cover").style.display="none"; load(0); };
+</script>
+</body>
+</html>
