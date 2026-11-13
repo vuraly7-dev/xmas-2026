@@ -115,6 +115,7 @@ body{font-family:"Noto Sans TC",system-ui,sans-serif;background:#000;color:var(-
   <div class="lights"></div>
   <div class="hud" id="hud" style="visibility:hidden">
     <div class="ep-tag" id="eptag">EP.1</div>
+    <button id="snd" aria-label="音效開關" style="margin-left:auto;margin-right:10px;width:30px;height:30px;border-radius:50%;border:1px solid #ffffff33;background:transparent;color:#fff;font-size:14px;cursor:pointer">🔊</button>
     <div class="batt" id="batt">社交電量<div class="cell"><i id="bfill"></i><b id="btxt">100%</b></div></div>
   </div>
   <div class="screen" id="screen"></div>
@@ -126,6 +127,60 @@ body{font-family:"Noto Sans TC",system-ui,sans-serif;background:#000;color:var(-
 const shareUrl = () => /claude|anthropic|usercontent/.test(location.hostname) || location.protocol==="file:" ? "" : "\n"+location.origin+location.pathname;
 document.querySelector(".lights").innerHTML = "<i></i>".repeat(14);
 const $ = id => document.getElementById(id);
+
+/* ===== 音效：全部由程式即時合成（鍵盤聲、提示音），不使用任何音效檔 ===== */
+const SFX=(()=>{
+  let ctx=null,out=null,noise=null,on=true,unlocked=false;
+  function iosUnlock(){
+    try{ const sr=8000,len=sr/2,buf=new ArrayBuffer(44+len*2),v=new DataView(buf);
+      const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+      w(0,"RIFF");v.setUint32(4,36+len*2,true);w(8,"WAVEfmt ");v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);
+      v.setUint32(24,sr,true);v.setUint32(28,sr*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,"data");v.setUint32(40,len*2,true);
+      const a=new Audio(URL.createObjectURL(new Blob([buf],{type:"audio/wav"}))); a.loop=true; a.setAttribute("playsinline",""); a.volume=.01; a.play().catch(()=>{});
+    }catch(e){}
+  }
+  function ensure(){
+    if(!ctx){ ctx=new (window.AudioContext||window.webkitAudioContext)(); out=ctx.createGain(); out.gain.value=.5; out.connect(ctx.destination);
+      const len=ctx.sampleRate*.05; noise=ctx.createBuffer(1,len,ctx.sampleRate); const d=noise.getChannelData(0);
+      for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3); }
+    if(!unlocked){ unlocked=true; iosUnlock(); }
+    if(ctx.state!=="running") ctx.resume();
+  }
+  function key(t,vol){
+    const s=ctx.createBufferSource(); s.buffer=noise; s.playbackRate.value=.8+Math.random()*.5;
+    const bp=ctx.createBiquadFilter(); bp.type="bandpass"; bp.frequency.value=2200+Math.random()*1800; bp.Q.value=1.2;
+    const g=ctx.createGain(); g.gain.value=vol*(.7+Math.random()*.5);
+    s.connect(bp).connect(g).connect(out); s.start(t);
+    const o=ctx.createOscillator(), og=ctx.createGain(); o.frequency.value=140+Math.random()*40;
+    og.gain.setValueAtTime(vol*.5,t); og.gain.exponentialRampToValueAtTime(.0001,t+.04);
+    o.connect(og).connect(out); o.start(t); o.stop(t+.05);
+  }
+  function tone(f1,f2,t,len,type,vol){
+    const o=ctx.createOscillator(), g=ctx.createGain(); o.type=type||"sine";
+    o.frequency.setValueAtTime(f1,t); if(f2) o.frequency.exponentialRampToValueAtTime(f2,t+len*.8);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+len);
+    o.connect(g).connect(out); o.start(t); o.stop(t+len+.03);
+  }
+  const P={
+    type(n){ const t=ctx.currentTime; let x=0; for(let i=0;i<n;i++){ x+=.045+Math.random()*.05; key(t+x,.35); } },
+    pop(){ const t=ctx.currentTime; tone(880,0,t,.08,"sine",.18); tone(1320,0,t+.06,.12,"sine",.18); },
+    boom(){ const t=ctx.currentTime; tone(160,60,t,.6,"sine",.45); tone(320,120,t,.3,"triangle",.12); },
+    tap(){ const t=ctx.currentTime; key(t,.5); tone(1200,0,t,.06,"sine",.12); },
+    title(){ const t=ctx.currentTime; tone(523.25,0,t,.6,"sine",.16); tone(783.99,0,t+.12,.7,"sine",.14); },
+    down(){ const t=ctx.currentTime; tone(660,330,t,.35,"triangle",.18); },
+    up(){ const t=ctx.currentTime; tone(440,880,t,.3,"sine",.2); tone(880,1320,t+.12,.25,"sine",.12); },
+    end(){ const t=ctx.currentTime; [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,0,t+i*.13,.6,"sine",.2)); },
+    drain(){ const t=ctx.currentTime; tone(440,110,t,.8,"sawtooth",.08); tone(220,55,t+.1,.8,"sine",.25); }
+  };
+  return {
+    play(name,arg){ if(!on) return; try{ ensure(); P[name](arg); }catch(e){} },
+    unlock(){ try{ ensure(); }catch(e){} },
+    toggle(){ on=!on; return on; },
+    pause(h){ if(!ctx) return; try{ h? ctx.suspend() : ctx.resume(); }catch(e){} }
+  };
+})();
+document.addEventListener("visibilitychange",()=>SFX.pause(document.hidden));
+
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
 /* 劇本：n=旁白 s=對白 i=內心 B=大字 */
@@ -193,10 +248,11 @@ function start(){
       <p>公司聖誕派對，全員強制參加。<br>你的社交電量只有 <b style="color:#fff">100%</b>。<br>每一個選擇，都會消耗或回復電量。</p>
       <div class="eps">${EP.map((_,i)=>`<div>EP${i+1}</div>`).join("")}</div>
       <div class="rule">⚡ 電量歸零 → 觸發「速閃結局」</div>
+      <div class="rule" style="font-size:12px">🔊 有鍵盤打字音效，右上角可關閉</div>
       <div class="rule" style="font-size:11px;opacity:.7">※ 劇情與角色純屬虛構，如有雷同純屬巧合・© 2026 liva</div>
     </div>`;
   $("dock").innerHTML = `<button class="btn" id="go">▶ 開始第 1 集</button>`;
-  $("go").onclick = ()=> episode(0);
+  $("go").onclick = ()=>{ SFX.unlock(); SFX.play("tap"); episode(0); };
 }
 
 function setBatt(v){
@@ -214,6 +270,7 @@ async function episode(i){
   $("bg").style.background=`radial-gradient(ellipse at 50% 15%,${ep.bg},transparent 75%)`;
   $("dock").innerHTML="";
   $("screen").innerHTML=`<div class="tcard"><div class="n">第 ${i+1} 集</div><h2>${ep.t}</h2><div class="d">${ep.d}</div></div>`;
+  SFX.play("title");
   await sleep(1500);
   $("screen").innerHTML=`<div class="big-emoji">${ep.e}</div><div class="lines" id="lines"></div>`;
   const L=$("lines");
@@ -224,12 +281,13 @@ async function episode(i){
     else if(ln[0]==="s") { d.className="line say"; d.innerHTML=`<b>${ln[1]}</b>${ln[2]}`; }
     else { d.className="line inner"; d.innerHTML=`<b>（內心）</b>${ln[2]}`; }
     L.appendChild(d); $("screen").scrollTop=1e9;
+    if(ln[0]==="B") SFX.play("boom"); else if(ln[0]==="s") SFX.play("pop"); else SFX.play("type", Math.min(12, Math.ceil((ln[2]||ln[1]).length/2)));
     await sleep(ln[0]==="B"?1300:950);
   }
   const q=document.createElement("div"); q.className="line nar"; q.style.color="#fff"; q.style.fontStyle="normal"; q.style.fontWeight="700"; q.textContent=ep.q;
   L.appendChild(q); $("screen").scrollTop=1e9;
   $("dock").innerHTML = ep.c.map((c,k)=>`<button class="choice" data-k="${k}" style="animation-delay:${k*.08}s">${c[0]}<small>${c[1]}</small></button>`).join("");
-  $("dock").querySelectorAll(".choice").forEach(b=>b.onclick=()=>choose(i,+b.dataset.k));
+  $("dock").querySelectorAll(".choice").forEach(b=>b.onclick=()=>{ SFX.play("tap"); choose(i,+b.dataset.k); });
 }
 
 async function choose(i,k){
@@ -244,17 +302,18 @@ async function choose(i,k){
   dl.textContent=`社交電量 ${c[2]>=0?"+":""}${c[2]}%`; L.appendChild(dl);
   S.e += c[3]; S.picks.push(c[0]);
   setBatt(S.batt + c[2]); S.log.push(S.batt);
+  SFX.play(c[2]<0?"down":"up");
   $("screen").scrollTop=1e9;
   await sleep(700);
-  if(S.batt<=0){ return ending(true); }
+  if(S.batt<=0){ SFX.play("drain"); return ending(true); }
   if(ep.next){
     const t=document.createElement("div"); t.className="teaser"; t.innerHTML=`<span>下集預告</span>${ep.next}`; L.appendChild(t);
     $("screen").scrollTop=1e9;
     $("dock").innerHTML=`<button class="btn" id="nx">▶ 看第 ${i+2} 集</button>`;
-    $("nx").onclick=()=>episode(i+1);
+    $("nx").onclick=()=>{ SFX.play("tap"); episode(i+1); };
   } else {
     $("dock").innerHTML=`<button class="btn" id="nx">🎬 看我的結局</button>`;
-    $("nx").onclick=()=>ending(false);
+    $("nx").onclick=()=>{ SFX.play("end"); ending(false); };
   }
 }
 
@@ -303,7 +362,7 @@ function ending(drained){
     </div>`;
   setTimeout(()=>{ const d=$("dot"); if(d) d.style.left=ePct+"%"; },120);
   $("dock").innerHTML=`<button class="btn" id="sh">複製結果，找朋友比 e 度 👀</button><button class="btn ghost" id="re">重看一次，換條路線</button>`;
-  $("re").onclick=start;
+  $("re").onclick=()=>{ SFX.play("tap"); start(); };
   $("sh").onclick=async()=>{
     const txt=`我在《i 人的聖誕生存指南》打出「${title}」結局！\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄${shareUrl()}`;
     try{ await navigator.clipboard.writeText(txt); toast("已複製！貼給朋友比比看 🎄"); }
@@ -312,6 +371,7 @@ function ending(drained){
 }
 
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
+$("snd").onclick=()=>{ const on=SFX.toggle(); $("snd").textContent=on?"🔊":"🔇"; if(on) SFX.play("tap"); };
 start();
 </script>
 </body>
