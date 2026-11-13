@@ -114,6 +114,7 @@ body{font-family:"Noto Sans TC",system-ui,sans-serif;background:#000;color:var(-
   <div class="bgfx" id="bg"></div>
   <div class="lights"></div>
   <div class="hud" id="hud" style="visibility:hidden">
+    <a class="homebtn" href="./" aria-label="回首頁" style="display:none;margin-right:10px;width:30px;height:30px;border-radius:50%;border:1px solid #ffffff33;color:#fff;text-decoration:none;font-size:14px;align-items:center;justify-content:center">🏠</a>
     <div class="ep-tag" id="eptag">EP.1</div>
     <button id="snd" aria-label="音效開關" style="margin-left:auto;margin-right:10px;width:30px;height:30px;border-radius:50%;border:1px solid #ffffff33;background:transparent;color:#fff;font-size:14px;cursor:pointer">🔊</button>
     <div class="batt" id="batt">社交電量<div class="cell"><i id="bfill"></i><b id="btxt">100%</b></div></div>
@@ -331,7 +332,8 @@ function start(){
       <div class="rule" style="font-size:12px">🔊 有鍵盤打字音效，右上角可關閉</div>
       <div class="rule" style="font-size:11px;opacity:.7">※ 劇情與角色純屬虛構，如有雷同純屬巧合・© 2026 liva</div>
     </div>`;
-  $("dock").innerHTML = `<button class="btn" id="go">▶ 開始第 1 集</button>`;
+  $("dock").innerHTML = `<button class="btn" id="go">▶ 開始第 1 集</button><a class="homelink" href="./" style="display:none;text-align:center;color:#a49e96;font-size:14px;margin-top:12px;text-decoration:none">← 回首頁，看其他遊戲</a>`;
+  showHome();
   $("go").onclick = ()=>{ SFX.unlock(); SFX.play("tap"); episode(0); };
 }
 
@@ -469,7 +471,9 @@ function ending(drained){
   setTimeout(()=>{ const d=$("dot"); if(d) d.style.left=ePct+"%"; },120);
   if(hidden) SFX.play("end");
   $("dock").innerHTML=`<button class="btn" id="img">📸 產生結果圖卡</button>
-    <div style="display:flex;gap:8px;margin-top:8px"><a id="line" class="btn" target="_blank" rel="noopener" style="margin:0;flex:0 0 88px;background:#06C755;box-shadow:none;text-align:center;text-decoration:none;padding:14px 0">LINE</a><button class="btn ghost" id="sh" style="margin:0">分享</button><button class="btn ghost" id="re" style="margin:0">換條路線</button></div>`;
+    <div style="display:flex;gap:8px;margin-top:8px"><a id="line" class="btn" target="_blank" rel="noopener" style="margin:0;flex:0 0 88px;background:#06C755;box-shadow:none;text-decoration:none;padding:0;display:flex;align-items:center;justify-content:center">LINE</a><button class="btn ghost" id="sh" style="margin:0">分享</button><button class="btn ghost" id="re" style="margin:0">換條路線</button></div>
+    <a class="homelink" href="./xmas-message.html" style="display:none;text-align:center;color:#f4c95d;font-size:14px;margin-top:12px;text-decoration:none">🎮 換玩另一款：💬 聖誕祝福，不准誤會 →</a>`;
+  showHome();
   const msg=`我在《i 人的聖誕生存指南》打出「${title}」${hidden?"（隱藏結局！）":""}\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄`;
   $("re").onclick=()=>{ SFX.play("tap"); start(); };
   $("sh").onclick=()=>{ SFX.play("tap"); Share.text(msg, toast); };
@@ -481,6 +485,7 @@ function ending(drained){
       tags, cta:"你是哪一種？來玩玩看 👉" }, msg, toast); };
 }
 
+function showHome(){ if(!Share.siteUrl()) return; document.querySelectorAll(".homelink").forEach(a=>a.style.display="block"); document.querySelectorAll(".homebtn").forEach(a=>a.style.display="inline-flex"); }
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
 $("snd").onclick=()=>{ const on=SFX.toggle(); $("snd").textContent=on?"🔊":"🔇"; if(on) SFX.play("tap"); };
 start();

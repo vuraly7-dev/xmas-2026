@@ -116,10 +116,11 @@ header .lv{margin-left:auto;font-size:12px;background:#ffffff1f;padding:4px 10px
     </div>
     <p style="font-size:14px">從「開頭、中段、結尾」各選一句，<br>拼出讓<b>群組裡沒有人誤會</b>的祝福。<br>三關：公司群組 → 同學會群組 → 家族群組</p>
     <button class="btn" id="go" style="margin-top:22px">開始發訊息</button>
+    <a class="homelink" href="./" style="display:none;color:#b9d6c8;font-size:14px;margin-top:14px;text-decoration:none">← 回首頁，看其他遊戲</a>
     <div class="mnote">遊戲有按鍵音效・iPhone 若沒聲音，請調高媒體音量</div>
     <div class="foot">純屬虛構娛樂・不讀取、不儲存任何資料・© 2026 liva</div>
   </div>
-  <header><div class="gi" id="gi"></div><div><b id="gn"></b><span id="gs"></span></div><div class="lv" id="lv"></div></header>
+  <header><a class="homebtn" href="./" aria-label="回首頁" style="display:none;width:32px;height:32px;border-radius:50%;background:#ffffff1f;color:#fff;text-decoration:none;font-size:15px;align-items:center;justify-content:center;flex:none">🏠</a><div class="gi" id="gi"></div><div><b id="gn"></b><span id="gs"></span></div><div class="lv" id="lv"></div></header>
   <div class="readers" id="readers"></div>
   <div id="chat"></div>
   <div class="sheet" id="sheet"></div>
@@ -377,8 +378,10 @@ function final(){
     <div class="tt">${title}</div>
     <div class="lvls">${LV.map((L,i)=>`<div>${L.icon} ${L.name.slice(0,4)}<b>${"⭐".repeat(results[i]?results[i].stars:0)}</b>傳了 ${results[i]?results[i].tries:0} 次</div>`).join("")}</div>
     <button class="btn" id="img">📸 產生戰績圖卡</button>
-    <div style="display:flex;gap:8px;margin-top:9px"><a id="line" class="btn" target="_blank" rel="noopener" style="margin:0;flex:0 0 88px;background:#06C755;box-shadow:none;text-align:center;text-decoration:none;padding:14px 0">LINE</a><button class="btn ghost" id="sh" style="margin:0">分享</button><button class="btn ghost" id="again" style="margin:0">從頭再玩</button></div>
+    <div style="display:flex;gap:8px;margin-top:9px"><a id="line" class="btn" target="_blank" rel="noopener" style="margin:0;flex:0 0 88px;background:#06C755;box-shadow:none;text-decoration:none;padding:0;display:flex;align-items:center;justify-content:center">LINE</a><button class="btn ghost" id="sh" style="margin:0">分享</button><button class="btn ghost" id="again" style="margin:0">從頭再玩</button></div>
+    <a class="homelink" href="./i-person.html" style="display:none;color:#1f8a5b;font-weight:700;font-size:14px;margin-top:14px;text-decoration:none">🎮 換玩另一款：🎄 i 人的聖誕生存指南 →</a>
     <div style="font-size:11px;color:var(--muted);margin-top:12px">純屬虛構娛樂・© 2026 liva</div></div>`;
+  showHome();
   s.classList.add("show");
   setTimeout(()=>{ try{ s.scrollIntoView({behavior:"smooth",block:"start"}); }catch(e){} },60);
   const msg=`我在《聖誕祝福，不准誤會》拿到 ${total}/9 顆星，稱號「${title}」🎄\n總共傳了 ${tt} 次訊息才讓所有群組沒人誤會。\n家族群組最難，你敢挑戰嗎？`;
@@ -392,7 +395,9 @@ function final(){
       rows: LV.map((L,i)=>[L.icon+" "+L.name.replace(/（.*）/,""), "⭐".repeat(results[i]?results[i].stars:0)+`（${results[i]?results[i].tries:0} 次）`]),
       tags:["#同一句話每個人讀到的都不一樣"], cta:"你能讓全群組沒人誤會嗎？👉" }, msg, toast); };
 }
+function showHome(){ if(!Share.siteUrl()) return; document.querySelectorAll(".homelink").forEach(a=>a.style.display="block"); document.querySelectorAll(".homebtn").forEach(a=>a.style.display="inline-flex"); }
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
+showHome();
 $("go").onclick=()=>{ $("cover").style.display="none"; Music.start(); Music.sfx("win"); load(0); };
 document.addEventListener("visibilitychange",()=>Music.pause(document.hidden));
 </script>
