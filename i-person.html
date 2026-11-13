@@ -132,15 +132,18 @@ const $ = id => document.getElementById(id);
 const Share=(()=>{
   const siteUrl=()=> /claude|anthropic|usercontent/.test(location.hostname)||location.protocol==="file:" ? "" : location.origin+location.pathname;
   async function copy(s){ try{ await navigator.clipboard.writeText(s); return true; }catch(e){ return false; } }
+  // LINE 與部分 App 不接受「文字＋網址」同時分享，所以把網址併進文字裡，只送一種內容
   async function text(msg, toastFn){
-    const url=siteUrl();
+    const url=siteUrl(), full=msg+(url?"\n"+url:"");
     if(navigator.share && url){
-      try{ await navigator.share({text:msg, url}); return; }
+      try{ await navigator.share({text:full}); return; }
       catch(e){ if(e && e.name==="AbortError") return; }
     }
-    const ok=await copy(msg+(url?"\n"+url:""));
+    const ok=await copy(full);
     toastFn(ok?"已複製！貼給朋友吧 🎄":"無法自動複製，截圖分享也可以 📸");
   }
+  // LINE 官方分享網址：在手機上會直接打開 LINE 的分享畫面
+  function lineHref(msg){ const url=siteUrl(); return "https://line.me/R/share?text="+encodeURIComponent(msg+(url?"\n"+url:"")); }
   function wrap(ctx, str, maxW){
     const out=[]; let line="";
     for(const ch of [...str]){
@@ -183,7 +186,7 @@ const Share=(()=>{
     const m=document.createElement("div");
     m.style.cssText="position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:12px;font-family:'Noto Sans TC',sans-serif";
     m.innerHTML=`<img src="${dataUrl}" alt="結果圖卡" style="max-width:100%;max-height:68vh;border-radius:14px;box-shadow:0 10px 40px #000">
-      <div style="color:#ddd;font-size:13px;text-align:center">手機可<b style="color:#fff">長按圖片</b>儲存，再分享到限動</div>
+      <div style="color:#ddd;font-size:13px;text-align:center;line-height:1.7">手機可<b style="color:#fff">長按圖片</b>儲存，再分享到限動<br>傳 LINE：先存圖片，再到 LINE 聊天室傳送最穩定</div>
       <div style="display:flex;gap:8px;width:100%;max-width:420px">
         ${canShareFile?'<button data-a="share" style="flex:1;font:inherit;font-weight:700;padding:13px;border:0;border-radius:12px;background:#e3263f;color:#fff">分享圖片</button>':''}
         <a data-a="dl" download="xmas-result.png" href="${dataUrl}" style="flex:1;text-align:center;text-decoration:none;font-weight:700;padding:13px;border-radius:12px;background:#fff;color:#111">下載圖片</a>
@@ -198,10 +201,10 @@ const Share=(()=>{
       const c=await card(opts), url=c.toDataURL("image/png");
       let file=null; try{ const blob=await new Promise(r=>c.toBlob(r,"image/png")); file=new File([blob],"xmas-result.png",{type:"image/png"}); }catch(e){}
       const canShareFile=!!(file && navigator.canShare && navigator.canShare({files:[file]}));
-      modal(url, canShareFile, async()=>{ try{ await navigator.share({files:[file], text:msg+(siteUrl()?"\n"+siteUrl():"")}); }catch(e){} });
+      modal(url, canShareFile, async()=>{ try{ await navigator.share({files:[file]}); }catch(e){} });
     }catch(e){ toastFn("圖卡產生失敗，截圖分享也可以 📸"); }
   }
-  return {text, image, siteUrl};
+  return {text, image, siteUrl, lineHref};
 })();
 
 
@@ -466,10 +469,11 @@ function ending(drained){
   setTimeout(()=>{ const d=$("dot"); if(d) d.style.left=ePct+"%"; },120);
   if(hidden) SFX.play("end");
   $("dock").innerHTML=`<button class="btn" id="img">📸 產生結果圖卡</button>
-    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn ghost" id="sh" style="margin:0">分享給朋友</button><button class="btn ghost" id="re" style="margin:0">換條路線</button></div>`;
+    <div style="display:flex;gap:8px;margin-top:8px"><a id="line" class="btn" target="_blank" rel="noopener" style="margin:0;flex:0 0 88px;background:#06C755;box-shadow:none;text-align:center;text-decoration:none;padding:14px 0">LINE</a><button class="btn ghost" id="sh" style="margin:0">分享</button><button class="btn ghost" id="re" style="margin:0">換條路線</button></div>`;
   const msg=`我在《i 人的聖誕生存指南》打出「${title}」${hidden?"（隱藏結局！）":""}\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄`;
   $("re").onclick=()=>{ SFX.play("tap"); start(); };
   $("sh").onclick=()=>{ SFX.play("tap"); Share.text(msg, toast); };
+  $("line").href=Share.lineHref(msg);
   $("img").onclick=()=>{ SFX.play("tap"); Share.image({
       bg1:"#2a0a12", bg2:"#0b0b10", accent:"#f4c95d", accent2:"#ff6a7e", text:"#f5f2ee", muted:"#a49e96",
       kicker: hidden?"🔓 隱藏結局・i 人的聖誕生存指南":"i 人的聖誕生存指南", emoji, title, sub,
