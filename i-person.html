@@ -128,6 +128,83 @@ const shareUrl = () => /claude|anthropic|usercontent/.test(location.hostname) ||
 document.querySelector(".lights").innerHTML = "<i></i>".repeat(14);
 const $ = id => document.getElementById(id);
 
+/* ===== 分享工具：手機分享選單＋結果圖卡（圖卡在瀏覽器內用 canvas 產生，不上傳任何資料） ===== */
+const Share=(()=>{
+  const siteUrl=()=> /claude|anthropic|usercontent/.test(location.hostname)||location.protocol==="file:" ? "" : location.origin+location.pathname;
+  async function copy(s){ try{ await navigator.clipboard.writeText(s); return true; }catch(e){ return false; } }
+  async function text(msg, toastFn){
+    const url=siteUrl();
+    if(navigator.share && url){
+      try{ await navigator.share({text:msg, url}); return; }
+      catch(e){ if(e && e.name==="AbortError") return; }
+    }
+    const ok=await copy(msg+(url?"\n"+url:""));
+    toastFn(ok?"已複製！貼給朋友吧 🎄":"無法自動複製，截圖分享也可以 📸");
+  }
+  function wrap(ctx, str, maxW){
+    const out=[]; let line="";
+    for(const ch of [...str]){
+      if(ch==="\n"){ out.push(line); line=""; continue; }
+      if(ctx.measureText(line+ch).width>maxW && line){ out.push(line); line=ch; } else line+=ch;
+    }
+    if(line) out.push(line); return out;
+  }
+  function rr(ctx,x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  async function card(o){
+    try{ await document.fonts.ready; }catch(e){}
+    const W=1080,H=1350,c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+    const g=x.createLinearGradient(0,0,0,H); g.addColorStop(0,o.bg1); g.addColorStop(1,o.bg2); x.fillStyle=g; x.fillRect(0,0,W,H);
+    const sans='"Noto Sans TC",system-ui,sans-serif', serif='"Noto Serif TC","Noto Sans TC",serif';
+    x.textAlign="center"; x.fillStyle=o.accent; x.font=`700 34px ${sans}`; x.fillText(o.kicker, W/2, 120);
+    x.font=`140px ${sans}`; x.fillText(o.emoji||"🎄", W/2, 300);
+    x.fillStyle=o.text; x.font=`900 84px ${serif}`;
+    let y=430; for(const l of wrap(x,o.title,W-160)){ x.fillText(l,W/2,y); y+=100; }
+    if(o.sub){ x.fillStyle=o.accent2||o.accent; x.font=`700 40px ${sans}`; for(const l of wrap(x,o.sub,W-180)){ x.fillText(l,W/2,y); y+=56; } }
+    y+=20;
+    const rows=o.rows||[], bh=96, by=y;
+    if(rows.length){
+      x.fillStyle="rgba(255,255,255,.09)"; rr(x,90,by,W-180,rows.length*bh+30,32); x.fill();
+      rows.forEach((r,i)=>{ const ry=by+30+i*bh+52;
+        x.textAlign="left"; x.fillStyle=o.muted; x.font=`500 36px ${sans}`; x.fillText(r[0],140,ry);
+        x.textAlign="right"; x.fillStyle=o.text; x.font=`900 44px ${sans}`;
+        let v=r[1]; while(x.measureText(v).width>W-560 && v.length>2) v=v.slice(0,-2)+"…"; x.fillText(v,W-140,ry); });
+      y=by+rows.length*bh+30+60;
+    }
+    if(o.tags && o.tags.length){
+      x.textAlign="center"; x.font=`500 34px ${sans}`; x.fillStyle=o.muted;
+      for(const l of wrap(x,o.tags.join("  "),W-180)){ x.fillText(l,W/2,y); y+=50; }
+    }
+    x.textAlign="center"; x.fillStyle=o.text; x.font=`700 40px ${sans}`; x.fillText(o.cta||"你也來玩玩看 👉", W/2, H-170);
+    x.fillStyle=o.muted; x.font=`500 30px ${sans}`; x.fillText(siteUrl().replace(/^https?:\/\//,"")||"聖誕節線上小遊戲 2026", W/2, H-115);
+    x.font=`500 24px ${sans}`; x.fillText("© 2026 liva", W/2, H-70);
+    return c;
+  }
+  function modal(dataUrl, canShareFile, onShare){
+    const m=document.createElement("div");
+    m.style.cssText="position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px;gap:12px;font-family:'Noto Sans TC',sans-serif";
+    m.innerHTML=`<img src="${dataUrl}" alt="結果圖卡" style="max-width:100%;max-height:68vh;border-radius:14px;box-shadow:0 10px 40px #000">
+      <div style="color:#ddd;font-size:13px;text-align:center">手機可<b style="color:#fff">長按圖片</b>儲存，再分享到限動</div>
+      <div style="display:flex;gap:8px;width:100%;max-width:420px">
+        ${canShareFile?'<button data-a="share" style="flex:1;font:inherit;font-weight:700;padding:13px;border:0;border-radius:12px;background:#e3263f;color:#fff">分享圖片</button>':''}
+        <a data-a="dl" download="xmas-result.png" href="${dataUrl}" style="flex:1;text-align:center;text-decoration:none;font-weight:700;padding:13px;border-radius:12px;background:#fff;color:#111">下載圖片</a>
+        <button data-a="close" style="flex:1;font:inherit;font-weight:700;padding:13px;border:1px solid #fff6;border-radius:12px;background:transparent;color:#fff">關閉</button>
+      </div>`;
+    m.addEventListener("click",e=>{ const a=e.target.closest("[data-a]"); if(!a){ if(e.target===m) m.remove(); return; }
+      if(a.dataset.a==="close") m.remove(); if(a.dataset.a==="share") onShare(); });
+    document.body.appendChild(m);
+  }
+  async function image(opts, msg, toastFn){
+    try{
+      const c=await card(opts), url=c.toDataURL("image/png");
+      let file=null; try{ const blob=await new Promise(r=>c.toBlob(r,"image/png")); file=new File([blob],"xmas-result.png",{type:"image/png"}); }catch(e){}
+      const canShareFile=!!(file && navigator.canShare && navigator.canShare({files:[file]}));
+      modal(url, canShareFile, async()=>{ try{ await navigator.share({files:[file], text:msg+(siteUrl()?"\n"+siteUrl():"")}); }catch(e){} });
+    }catch(e){ toastFn("圖卡產生失敗，截圖分享也可以 📸"); }
+  }
+  return {text, image, siteUrl};
+})();
+
+
 /* ===== 音效：全部由程式即時合成（鍵盤聲、提示音），不使用任何音效檔 ===== */
 const SFX=(()=>{
   let ctx=null,out=null,noise=null,on=true,unlocked=false;
@@ -185,49 +262,49 @@ const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
 /* 劇本：n=旁白 s=對白 i=內心 B=大字 */
 const EP = [
- {t:"群組通知", d:"12/19・週五倒數 3 天", e:"📱", bg:"#14213d",
+ {t:"群組通知", d:"派對前 3 天・下午 3:12", e:"📱", bg:"#14213d",
   lines:[["n","星期二下午 3:12，手機震了一下。"],["s","HR 小美","【公告】週五晚上聖誕派對，全員參加 🎄 請穿紅色，每組要準備 3 分鐘表演！"],["i","你","……全員？表演？？"],["n","已讀人數：47。你是第 48 個。"]],
   q:"你要怎麼回應？",
   c:[["已讀，然後假裝沒看到","把手機蓋起來就沒事了",0,-6,"你成功隱身。但小美在群組 @ 了你。"],
      ["回一張「收到🫡」貼圖","最低限度的社交禮儀",-5,4,"完美。不多不少，標準 i 人回覆。"],
      ["「我可以幫忙主持！」","你今天是不是喝太多咖啡",-22,20,"群組瞬間 30 個讚。你開始後悔了。"]],
   next:"週五晚上，派對門口站著一個人……正張開雙手。"},
- {t:"門口的擁抱", d:"12/20・派對開始", e:"🤗", bg:"#3a0d16",
+ {t:"門口的擁抱", d:"派對當晚・19:00 抵達", e:"🤗", bg:"#3a0d16",
   lines:[["n","派對會場，音樂開很大聲。"],["s","派對魂小君（全公司最 e 的人）","欸～～你來了！！！來抱一個！！！"],["n","她張開雙臂，距離你還有三步。"],["i","你","大腦正在計算逃生路線……"]],
   q:"三步、兩步……",
   c:[["假裝接電話，從旁邊繞過去","「喂？對對對，我在忙」",-4,-2,"小君抱了個空，轉身去抱下一個人。安全。"],
      ["迎上去：「好久不見！」","e 人模式，啟動",-16,15,"抱了 4 秒。你感覺靈魂被吸走一點點。"],
      ["直接躲進廁所充電 5 分鐘","廁所是 i 人的避難所",10,-10,"你在廁所滑了 5 分鐘脆，電量回升。"]],
   next:"你找了一個角落站好。但角落裡……已經有人了。"},
- {t:"角落的陌生人", d:"12/21・尷尬時刻", e:"😶", bg:"#1b2a1f",
+ {t:"角落的陌生人", d:"19:40・尷尬時刻", e:"😶", bg:"#1b2a1f",
   lines:[["n","隔壁部門的同事，你們從來沒說過話。"],["s","陌生同事","嗨……你是……那個……"],["n","沉默 3 秒。"],["n","沉默 5 秒。"],["i","你","這比季報還難。"]],
   q:"打破沉默？",
   c:[["「今天好冷喔」","天氣，永遠的安全牌",-9,5,"「對啊。」對話結束。但至少你們都盡力了。"],
      ["拿出手機假裝回訊息","對方也立刻拿出手機，默契十足",-2,-6,"兩個 i 人，一個角落，各滑各的。這就是和平。"],
      ["「你最近有在追什麼微短劇嗎？」","話題王炸",-14,16,"對方眼睛亮了，你們聊了 20 分鐘。你需要休息。"]],
   next:"主持人拿起麥克風：「接下來，我們要請一位……」"},
- {t:"被點名了", d:"12/22・聚光燈", e:"🎤", bg:"#3d2a05",
+ {t:"被點名了", d:"20:30・聚光燈", e:"🎤", bg:"#3d2a05",
   lines:[["s","主持人","接下來，請今年『最安靜的同事』上台！"],["n","聚光燈轉了一圈。"],["n","停在你身上。"],["B","全場 87 雙眼睛看著你。"],["i","你","我現在消失還來得及嗎？"]],
   q:"你的選擇是：",
   c:[["上台清唱一首聖誕歌","豁出去了",-30,25,"唱完全場歡呼。你的手還在抖。"],
      ["「不好意思，我今天喉嚨痛……」","經典藉口",-8,0,"主持人說「沒關係～」，但氣氛冷了 2 秒。"],
      ["把小君拉上台當伴舞","讓 e 人去扛",-18,14,"小君跳得比你唱得還認真。全場焦點轉移。"]],
   next:"交換禮物時間。你抽到的……是主管準備的禮物。"},
- {t:"主管的禮物", d:"12/23・交換禮物", e:"🎁", bg:"#2a1036",
+ {t:"主管的禮物", d:"21:15・交換禮物", e:"🎁", bg:"#2a1036",
   lines:[["s","主管","打開看看，喜不喜歡～"],["n","你慢慢拆開包裝紙。"],["n","是一本書。"],["B","《30 天成為更外向的人》"],["i","你","……這是暗示嗎？這是暗示吧？"]],
   q:"大家都在看你的反應：",
   c:[["「哇！我超需要的！」","表情管理 ㄅ級分",-14,10,"主管很滿意。你內心已經在退貨。"],
      ["尷尬微笑，點頭三下","標準 i 人反應",-9,-2,"全場安靜了一秒，然後有人開始鼓掌。"],
      ["「主管，你在暗示我嗎？」","直球對決",-20,20,"全場爆笑。主管笑到蹲下。你成了今晚的梗。"]],
   next:"派對結束了。但有人大喊：「走！續攤！」"},
- {t:"續攤危機", d:"12/24・平安夜", e:"🎶", bg:"#08303a",
+ {t:"續攤危機", d:"22:30・派對尾聲", e:"🎶", bg:"#08303a",
   lines:[["s","小君","走走走！大家去唱 KTV！今天唱到天亮！"],["n","所有人都開始穿外套。"],["n","有人已經在叫車了。"],["i","你","電量警告。電量警告。"]],
   q:"你要……",
   c:[["「我家的貓在等我」（你沒有養貓）","速閃，i 人最高奧義",15,-12,"你用最快的速度消失在夜色中。沒有人發現。"],
      ["跟去，但只負責點歌","人在心不在",-15,6,"你點了 12 首歌，自己一首都沒唱。完美。"],
      ["第一個衝去搶麥克風","今晚，你不是你",-32,25,"你唱了 3 小時。明天的你會恨今天的你。"]],
   next:"終於……回到家了。"},
- {t:"回家", d:"12/25・聖誕節", e:"🛋️", bg:"#1a1410",
+ {t:"回家", d:"23:50・終於到家", e:"🛋️", bg:"#1a1410",
   lines:[["n","打開家門。好安靜。"],["n","你倒在沙發上。"],["i","你","今天，我活下來了。"],["n","手機又震了一下。群組：「今天好好玩～明年再辦！」"]],
   q:"最後一個決定：",
   c:[["關機。躺平。聖誕快樂。","世界與我無關",30,-8,"你睡了 11 個小時。這是今年最好的聖誕禮物。"],
@@ -238,7 +315,7 @@ const EP = [
 
 let S;
 function start(){
-  S = {batt:100, e:0, ep:0, log:[], picks:[]};
+  S = {batt:100, e:0, ep:0, log:[], picks:[], idx:[]};
   $("hud").style.visibility="hidden";
   $("bg").style.background="radial-gradient(ellipse at 50% 20%,#3a0d16,transparent 70%)";
   $("screen").innerHTML = `
@@ -300,7 +377,7 @@ async function choose(i,k){
   await sleep(400);
   const dl=document.createElement("div"); dl.className="delta "+(c[2]<0?"minus":"plus");
   dl.textContent=`社交電量 ${c[2]>=0?"+":""}${c[2]}%`; L.appendChild(dl);
-  S.e += c[3]; S.picks.push(c[0]);
+  S.e += c[3]; S.picks.push(c[0]); S.idx.push(k);
   setBatt(S.batt + c[2]); S.log.push(S.batt);
   SFX.play(c[2]<0?"down":"up");
   $("screen").scrollTop=1e9;
@@ -317,34 +394,56 @@ async function choose(i,k){
   }
 }
 
+const ENDINGS=["純血 i 人","適應型 ie 人","隱藏版 e 人","電量耗盡・速閃結局","隱形人結局","派對之王結局","中庸之道結局"];
+function gotEndings(add){
+  let s=[]; try{ s=JSON.parse(localStorage.getItem("ip-endings")||"[]"); }catch(e){}
+  if(add && !s.includes(add)){ s.push(add); try{ localStorage.setItem("ip-endings",JSON.stringify(s)); }catch(e){} }
+  return s;
+}
 function ending(drained){
   // e 度：把累積 e 分數映射到 0–100
   const ePct = Math.round(Math.max(3, Math.min(97, 35 + S.e*0.55)));
-  let title, sub, desc, tags;
+  const saver = EP.map(ep=>ep.c.reduce((bi,c,i,arr)=>c[2]>arr[bi][2]?i:bi,0));
+  let title, sub, desc, tags, hidden=false, emoji="🎄";
   if(drained){
-    title="電量耗盡・速閃結局"; sub=`在第 ${S.ep+1} 集默默消失`;
+    title="電量耗盡・速閃結局"; sub=`在第 ${S.ep+1} 集默默消失`; emoji="🪫";
     desc=`你在「${EP[S.ep].t}」那一刻電量歸零，悄悄從派對消失。沒有人發現你離開，這正是 i 人的最高境界。回家路上的便利商店，是你今晚最溫暖的地方。`;
     tags=["#速閃大師","#社交電量0%","#隱形技能滿點"];
+  } else if(S.idx[0]===2 && S.idx[3]===0 && S.idx[5]===2){
+    hidden=true; title="派對之王結局"; sub="明年尾牙主持人，也是你"; emoji="👑";
+    desc="主持、上台清唱、第一個搶麥——今晚整場派對都是你的。大家已經忘了你曾經說過自己是 i 人。明天醒來的你，大概需要三天才能恢復。";
+    tags=["#派對之王","#明年也是你","#自稱i人"];
+  } else if(S.idx.length===EP.length && S.idx.every((k,i)=>k===saver[i])){
+    hidden=true; title="隱形人結局"; sub="派對結束才有人問：「你今天有來嗎？」"; emoji="🫥";
+    desc="你全程開啟省電模式：沒被抱到、沒被點名、沒去續攤。你完美融入了背景，連監視器都拍不太到你。這不是逃避，這是一種藝術。";
+    tags=["#隱形人","#省電模式","#你今天有來嗎"];
+  } else if(S.idx.length===EP.length && S.idx.every(k=>k===1)){
+    hidden=true; title="中庸之道結局"; sub="每一題都選中間，完美平均的人類"; emoji="⚖️";
+    desc="不衝也不躲，不熱情也不冷淡。你是派對裡最穩定的存在，像一杯常溫的白開水。沒人記得你說了什麼，但大家都覺得你人不錯。";
+    tags=["#中庸之道","#常溫白開水","#人不錯"];
   } else if(ePct>=65){
-    title="隱藏版 e 人"; sub="披著 i 人外皮的派對動物";
+    title="隱藏版 e 人"; sub="披著 i 人外皮的派對動物"; emoji="🕺";
     desc="你嘴上說自己是 i 人，但今晚主持、唱歌、搶麥一樣沒少。真相是：你只是需要一個藉口。明年的派對負責人，非你莫屬。";
     tags=["#其實是e人","#派對救星","#明年主持人"];
   } else if(ePct>=45){
-    title="適應型 ie 人"; sub="該社交時社交，該消失時消失";
+    title="適應型 ie 人"; sub="該社交時社交，該消失時消失"; emoji="🔋";
     desc="你懂得在必要時切換 e 人模式，也知道什麼時候該躲進廁所充電。這是職場最高級的生存技能：電量管理大師。";
     tags=["#ie人","#電量管理大師","#職場生存王"];
   } else {
-    title="純血 i 人"; sub="守住了自己的電量與尊嚴";
+    title="純血 i 人"; sub="守住了自己的電量與尊嚴"; emoji="🛋️";
     desc="全場最安靜，但你活下來了，而且電量還有剩。你不需要別人的掌聲，回家關機的那一刻，就是你的聖誕奇蹟。";
     tags=["#純血i人","#回家就是勝利","#今日社交額度已用完"];
   }
+  const got=gotEndings(title);
   S.result={title,ePct};
   $("hud").style.visibility="hidden";
-  $("bg").style.background="radial-gradient(ellipse at 50% 10%,#3a0d16,transparent 70%)";
+  $("bg").style.background=`radial-gradient(ellipse at 50% 10%,${hidden?"#3d2a05":"#3a0d16"},transparent 70%)`;
   const bars = S.log.map((v,i)=>`<div style="height:${Math.max(4,v)}%;background:${v>50?"#2fbf71":v>20?"#f4c95d":"#e3263f"}"><span>EP${i+1}</span></div>`).join("");
+  const coll = ENDINGS.map(e=>`<span style="${got.includes(e)?"":"opacity:.35"}">${got.includes(e)?e.replace("結局",""):"？？？"}</span>`).join("");
   $("screen").innerHTML=`
     <div class="res">
-      <div class="k">你的結局</div>
+      <div class="k">${hidden?"🔓 解鎖隱藏結局":"你的結局"}</div>
+      <div style="font-size:54px;text-align:center;margin-top:4px">${emoji}</div>
       <h2>${title}</h2>
       <div class="sub">${sub}</div>
       <p>${desc}</p>
@@ -357,17 +456,25 @@ function ending(drained){
         <div class="lab"><span>每集社交電量</span><b>剩 ${S.batt}%</b></div>
         <div class="spark">${bars}</div>
       </div>
+      <div class="meter" style="margin-top:28px">
+        <div class="lab"><span>結局收集</span><b>${got.length} / ${ENDINGS.length}</b></div>
+        <div class="tags" style="margin-top:6px">${coll}</div>
+      </div>
       <div class="tags">${tags.map(t=>`<span>${t}</span>`).join("")}</div>
-      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:14px">e 度純屬娛樂，並非心理測驗或人格評估<br>© 2026 liva</div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:14px">e 度純屬娛樂，並非心理測驗或人格評估<br>還有 3 個隱藏結局等你發現・© 2026 liva</div>
     </div>`;
   setTimeout(()=>{ const d=$("dot"); if(d) d.style.left=ePct+"%"; },120);
-  $("dock").innerHTML=`<button class="btn" id="sh">複製結果，找朋友比 e 度 👀</button><button class="btn ghost" id="re">重看一次，換條路線</button>`;
+  if(hidden) SFX.play("end");
+  $("dock").innerHTML=`<button class="btn" id="img">📸 產生結果圖卡</button>
+    <div style="display:flex;gap:8px;margin-top:8px"><button class="btn ghost" id="sh" style="margin:0">分享給朋友</button><button class="btn ghost" id="re" style="margin:0">換條路線</button></div>`;
+  const msg=`我在《i 人的聖誕生存指南》打出「${title}」${hidden?"（隱藏結局！）":""}\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄`;
   $("re").onclick=()=>{ SFX.play("tap"); start(); };
-  $("sh").onclick=async()=>{
-    const txt=`我在《i 人的聖誕生存指南》打出「${title}」結局！\ne 度 ${ePct}%，社交電量剩 ${S.batt}% 🔋\n${tags.join(" ")}\n你是哪一種？留友看 🎄${shareUrl()}`;
-    try{ await navigator.clipboard.writeText(txt); toast("已複製！貼給朋友比比看 🎄"); }
-    catch(e){ toast("無法自動複製，截圖分享也可以 📸"); }
-  };
+  $("sh").onclick=()=>{ SFX.play("tap"); Share.text(msg, toast); };
+  $("img").onclick=()=>{ SFX.play("tap"); Share.image({
+      bg1:"#2a0a12", bg2:"#0b0b10", accent:"#f4c95d", accent2:"#ff6a7e", text:"#f5f2ee", muted:"#a49e96",
+      kicker: hidden?"🔓 隱藏結局・i 人的聖誕生存指南":"i 人的聖誕生存指南", emoji, title, sub,
+      rows:[["e 度",ePct+"%"],["剩餘社交電量",S.batt+"%"],["結局收集",got.length+" / "+ENDINGS.length]],
+      tags, cta:"你是哪一種？來玩玩看 👉" }, msg, toast); };
 }
 
 function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),2400); }
